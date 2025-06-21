@@ -8,6 +8,8 @@ import shutil
 from pathlib import Path
 import urllib.request
 import tempfile
+from concurrent.futures import ProcessPoolExecutor, as_completed
+import multiprocessing
 
 
 VERSION = "0.2.0"
@@ -74,6 +76,12 @@ def check_ffmpeg():
         sys.exit(1)
 
 
+def convert_file_worker(args):
+    """Worker function for parallel processing."""
+    input_path, output_path, format = args
+    return convert_file(input_path, output_path, format), input_path, output_path
+
+
 def convert_file(input_path, output_path, format='alac'):
     """Convert a single FLAC file to ALAC/AAC M4A format."""
     try:
@@ -131,7 +139,7 @@ def convert_single_file(file_path, format='alac'):
         sys.exit(1)
 
 
-def convert_directory(dir_path, output_dir=None, format='alac'):
+def convert_directory(dir_path, output_dir=None, format='alac', workers=None):
     """Convert all FLAC files in a directory recursively."""
     input_dir = Path(dir_path)
 
@@ -151,7 +159,14 @@ def convert_directory(dir_path, output_dir=None, format='alac'):
         return
 
     format_desc = "ALAC (lossless)" if format == 'alac' else "AAC (lossy)"
+    
+    # Set default workers if not specified
+    if workers is None:
+        workers = min(8, multiprocessing.cpu_count())
+    
     print(f"Found {len(flac_files)} FLAC file(s) to convert to {format_desc}.")
+    if workers > 1:
+        print(f"Using {workers} parallel workers.")
 
     # Determine output directory
     if output_dir:
@@ -160,10 +175,8 @@ def convert_directory(dir_path, output_dir=None, format='alac'):
     else:
         output_base = input_dir
 
-    # Convert each file
-    converted = 0
-    failed = 0
-
+    # Prepare conversion tasks
+    conversion_tasks = []
     for flac_file in flac_files:
         # Calculate relative path and output path
         if output_dir:
@@ -172,13 +185,46 @@ def convert_directory(dir_path, output_dir=None, format='alac'):
             output_path.parent.mkdir(parents=True, exist_ok=True)
         else:
             output_path = flac_file.with_suffix('.m4a')
+        
+        conversion_tasks.append((flac_file, output_path, format))
 
-        print(f"Converting: {flac_file} -> {output_path}")
+    # Convert files (parallel or sequential)
+    converted = 0
+    failed = 0
 
-        if convert_file(flac_file, output_path, format):
-            converted += 1
-        else:
-            failed += 1
+    if workers == 1:
+        # Sequential processing (original behavior)
+        for flac_file, output_path, format in conversion_tasks:
+            print(f"Converting: {flac_file} -> {output_path}")
+            if convert_file(flac_file, output_path, format):
+                converted += 1
+            else:
+                failed += 1
+    else:
+        # Parallel processing
+        with ProcessPoolExecutor(max_workers=workers) as executor:
+            # Submit all tasks
+            future_to_task = {
+                executor.submit(convert_file_worker, task): task 
+                for task in conversion_tasks
+            }
+            
+            # Process completed tasks
+            for future in as_completed(future_to_task):
+                task = future_to_task[future]
+                flac_file, output_path, format = task
+                
+                try:
+                    success, input_path, output_path = future.result()
+                    if success:
+                        converted += 1
+                        print(f"✓ Completed: {input_path}")
+                    else:
+                        failed += 1
+                        print(f"✗ Failed: {input_path}")
+                except Exception as e:
+                    failed += 1
+                    print(f"✗ Error: {flac_file} - {str(e)}")
 
     print(f"\nConversion complete: {converted} succeeded, {failed} failed.")
 
@@ -188,10 +234,11 @@ def main():
         prog='flac-to-alac',
         description='Convert FLAC audio files to ALAC/AAC M4A format using ffmpeg.',
         epilog='Examples:\n'
-               '  flac-to-alac -f song.flac                     # Convert to ALAC (lossless)\n'
-               '  flac-to-alac -f song.flac --format aac       # Convert to AAC (lossy)\n'
-               '  flac-to-alac -d ./music\n'
-               '  flac-to-alac -d ./music -o ./converted --format aac',
+               '  flac-to-alac -f song.flac                        # Convert single file to AAC\n'
+               '  flac-to-alac -f song.flac --format alac         # Convert to ALAC (lossless)\n'
+               '  flac-to-alac -d ./music                         # Convert directory (parallel)\n'
+               '  flac-to-alac -d ./music -j 4                   # Use 4 parallel workers\n'
+               '  flac-to-alac -d ./music -o ./converted -j 1    # Sequential conversion',
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
 
@@ -230,6 +277,14 @@ def main():
         help='Output format: aac (lossy, default) or alac (lossless)',
         metavar='FORMAT'
     )
+    
+    parser.add_argument(
+        '-j', '--workers',
+        type=int,
+        default=None,
+        help='Number of parallel workers (default: auto-detect, 1 = sequential)',
+        metavar='N'
+    )
 
     args = parser.parse_args()
 
@@ -254,7 +309,7 @@ def main():
     if args.file:
         convert_single_file(args.file, args.format)
     else:
-        convert_directory(args.directory, args.output, args.format)
+        convert_directory(args.directory, args.output, args.format, args.workers)
 
 
 if __name__ == '__main__':
