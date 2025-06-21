@@ -6,64 +6,25 @@ import sys
 import subprocess
 import shutil
 from pathlib import Path
-import urllib.request
-import tempfile
 from concurrent.futures import ProcessPoolExecutor, as_completed
 import multiprocessing
 
 
-VERSION = "0.2.0"
+VERSION = "0.3.0"
 REPO_URL = "https://raw.githubusercontent.com/jezhou/flac-to-alac/main"
 
 
 def update_tool():
-    """Update flac-to-alac to the latest version."""
-    print("Checking for updates...")
-
-    try:
-        # Find where the script is installed
-        script_path = shutil.which('flac-to-alac')
-        if not script_path:
-            # If not in PATH, use the current file
-            script_path = os.path.abspath(__file__)
-
-        # Download the latest version
-        with tempfile.NamedTemporaryFile(mode='w', delete=False) as tmp_file:
-            response = urllib.request.urlopen(f"{REPO_URL}/flac-to-alac")
-            content = response.read().decode('utf-8')
-            tmp_file.write(content)
-            tmp_path = tmp_file.name
-
-        # Check if we need sudo for the installation directory and file
-        install_dir = os.path.dirname(script_path)
-        needs_sudo = (not os.access(install_dir, os.W_OK) or
-                     not os.access(script_path, os.W_OK))
-
-        # Replace the old script with the new one
-        try:
-            if needs_sudo:
-                print(f"Installing update to {script_path} (requires sudo)...")
-                subprocess.run(['sudo', 'cp', tmp_path, script_path], check=True)
-                subprocess.run(['sudo', 'chmod', '755', script_path], check=True)
-            else:
-                shutil.copy2(tmp_path, script_path)
-                os.chmod(script_path, 0o755)
-        except PermissionError:
-            print(f"Permission denied: Cannot write to {script_path}")
-            print("Please run the update with sudo:")
-            print(f"  sudo {script_path} --update")
-            os.unlink(tmp_path)
-            sys.exit(1)
-
-        # Clean up
-        os.unlink(tmp_path)
-
-        print("Successfully updated flac-to-alac!")
-        print("Run 'flac-to-alac --version' to see the new version.")
-
-    except Exception as e:
-        print(f"Error updating: {str(e)}")
-        sys.exit(1)
+    """Show instructions for updating flac-to-alac."""
+    print("To update flac-to-alac to the latest version, run:")
+    print()
+    print("curl -fsSL https://raw.githubusercontent.com/jezhou/flac-to-alac/main/install.sh | bash")
+    print()
+    print("This will safely replace your current installation with the latest version.")
+    print("You can also download and review the install script first:")
+    print("curl -fsSL https://raw.githubusercontent.com/jezhou/flac-to-alac/main/install.sh -o install.sh")
+    print("chmod +x install.sh")
+    print("./install.sh")
 
 
 def check_ffmpeg():
