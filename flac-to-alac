@@ -1,0 +1,165 @@
+#!/usr/bin/env python3
+
+import argparse
+import os
+import sys
+import subprocess
+import shutil
+from pathlib import Path
+
+
+def check_ffmpeg():
+    """Check if ffmpeg is installed on the system."""
+    if not shutil.which('ffmpeg'):
+        print("Error: ffmpeg is not installed.")
+        print("Please install ffmpeg to use this tool.")
+        print("On macOS: brew install ffmpeg")
+        print("On Ubuntu/Debian: sudo apt-get install ffmpeg")
+        sys.exit(1)
+
+
+def convert_file(input_path, output_path):
+    """Convert a single FLAC file to ALAC/M4A format."""
+    try:
+        cmd = [
+            'ffmpeg',
+            '-i', str(input_path),
+            '-c:a', 'alac',
+            '-c:v', 'copy',
+            '-loglevel', 'error',
+            '-y',  # Overwrite output files
+            str(output_path)
+        ]
+        
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        
+        if result.returncode != 0:
+            print(f"Error converting {input_path}: {result.stderr}")
+            return False
+        
+        return True
+    except Exception as e:
+        print(f"Error converting {input_path}: {str(e)}")
+        return False
+
+
+def convert_single_file(file_path):
+    """Convert a single FLAC file, placing output in the same directory."""
+    input_path = Path(file_path)
+    
+    if not input_path.exists():
+        print(f"Error: File '{file_path}' does not exist.")
+        sys.exit(1)
+    
+    if input_path.suffix.lower() != '.flac':
+        print(f"Error: File '{file_path}' is not a FLAC file.")
+        sys.exit(1)
+    
+    output_path = input_path.with_suffix('.m4a')
+    
+    print(f"Converting: {input_path} -> {output_path}")
+    
+    if convert_file(input_path, output_path):
+        print("Conversion completed successfully.")
+    else:
+        sys.exit(1)
+
+
+def convert_directory(dir_path, output_dir=None):
+    """Convert all FLAC files in a directory recursively."""
+    input_dir = Path(dir_path)
+    
+    if not input_dir.exists():
+        print(f"Error: Directory '{dir_path}' does not exist.")
+        sys.exit(1)
+    
+    if not input_dir.is_dir():
+        print(f"Error: '{dir_path}' is not a directory.")
+        sys.exit(1)
+    
+    # Find all FLAC files
+    flac_files = list(input_dir.rglob('*.flac')) + list(input_dir.rglob('*.FLAC'))
+    
+    if not flac_files:
+        print(f"No FLAC files found in '{dir_path}'.")
+        return
+    
+    print(f"Found {len(flac_files)} FLAC file(s) to convert.")
+    
+    # Determine output directory
+    if output_dir:
+        output_base = Path(output_dir)
+        output_base.mkdir(parents=True, exist_ok=True)
+    else:
+        output_base = input_dir
+    
+    # Convert each file
+    converted = 0
+    failed = 0
+    
+    for flac_file in flac_files:
+        # Calculate relative path and output path
+        if output_dir:
+            rel_path = flac_file.relative_to(input_dir)
+            output_path = output_base / rel_path.with_suffix('.m4a')
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+        else:
+            output_path = flac_file.with_suffix('.m4a')
+        
+        print(f"Converting: {flac_file} -> {output_path}")
+        
+        if convert_file(flac_file, output_path):
+            converted += 1
+        else:
+            failed += 1
+    
+    print(f"\nConversion complete: {converted} succeeded, {failed} failed.")
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        prog='flac-to-alac',
+        description='Convert FLAC audio files to ALAC/M4A format using ffmpeg.',
+        epilog='Examples:\n'
+               '  flac-to-alac -f song.flac\n'
+               '  flac-to-alac -d ./music\n'
+               '  flac-to-alac -d ./music -o ./converted',
+        formatter_class=argparse.RawDescriptionHelpFormatter
+    )
+    
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument(
+        '-f', '--file',
+        help='Convert a single FLAC file',
+        metavar='FILE'
+    )
+    group.add_argument(
+        '-d', '--directory',
+        help='Convert all FLAC files in a directory recursively',
+        metavar='DIR'
+    )
+    
+    parser.add_argument(
+        '-o', '--output',
+        help='Output directory (only works with -d option)',
+        metavar='DIR'
+    )
+    
+    args = parser.parse_args()
+    
+    # Check if ffmpeg is installed
+    check_ffmpeg()
+    
+    # Validate -o option
+    if args.output and not args.directory:
+        parser.error("-o/--output option can only be used with -d/--directory option")
+    
+    # Process based on input type
+    if args.file:
+        convert_single_file(args.file)
+    else:
+        convert_directory(args.directory, args.output)
+
+
+if __name__ == '__main__':
+    main()
