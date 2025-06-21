@@ -17,10 +17,26 @@ A command-line tool to convert FLAC audio files to ALAC (Apple Lossless Audio Co
 
 ## Installation
 
-### Via Homebrew (coming soon)
+### Quick Install (Recommended)
+
+Install with a single command:
 
 ```bash
-brew install flac-to-alac
+curl -fsSL https://raw.githubusercontent.com/yourusername/flac-to-alac/main/install.sh | bash
+```
+
+Or download and review the install script first:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/yourusername/flac-to-alac/main/install.sh -o install.sh
+chmod +x install.sh
+./install.sh
+```
+
+To install to a custom location (default is `/usr/local/bin`):
+
+```bash
+PREFIX=$HOME/.local ./install.sh
 ```
 
 ### Manual Installation
@@ -32,6 +48,12 @@ brew install flac-to-alac
    
    # Ubuntu/Debian
    sudo apt-get install ffmpeg
+   
+   # Fedora
+   sudo dnf install ffmpeg
+   
+   # Arch
+   sudo pacman -S ffmpeg
    ```
 
 2. Clone this repository:
@@ -45,10 +67,18 @@ brew install flac-to-alac
    chmod +x flac-to-alac
    ```
 
-4. Optionally, copy to your PATH:
+4. Copy to your PATH:
    ```bash
    sudo cp flac-to-alac /usr/local/bin/
    ```
+
+### Uninstall
+
+To remove flac-to-alac:
+
+```bash
+sudo rm /usr/local/bin/flac-to-alac
+```
 
 ## Usage
 
