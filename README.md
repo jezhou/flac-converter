@@ -1,6 +1,6 @@
 # flac-to-alac
 
-A command-line tool to convert FLAC audio files to ALAC (Apple Lossless Audio Codec) in M4A container format.
+A command-line tool to convert FLAC audio files to ALAC (Apple Lossless) or AAC (lossy) in M4A container format.
 
 ## Why
 
@@ -11,11 +11,12 @@ For transparency, most of the legwork was done by Claude Code and audited / twea
 
 ## Features
 
-- Convert single FLAC files to ALAC/M4A
+- Convert single FLAC files to ALAC (lossless) or AAC (lossy) M4A
 - Batch convert entire directories recursively
 - Preserve directory structure when converting
 - Specify custom output directory for batch conversions
 - Preserves album artwork and metadata
+- Choose between lossless (ALAC) and lossy (AAC) compression
 
 ## Requirements
 
@@ -108,16 +109,28 @@ sudo rm /usr/local/bin/flac-to-alac
 
 ### Convert a single file
 
+Convert to ALAC (lossless, default):
 ```bash
 flac-to-alac -f song.flac
+```
+
+Convert to AAC (lossy, smaller file size):
+```bash
+flac-to-alac -f song.flac --format aac
 ```
 
 This will create `song.m4a` in the same directory as the input file.
 
 ### Convert all FLAC files in a directory
 
+Convert to ALAC (default):
 ```bash
 flac-to-alac -d ./music
+```
+
+Convert to AAC:
+```bash
+flac-to-alac -d ./music --format aac
 ```
 
 This will recursively find all FLAC files in the `./music` directory and convert them to M4A, preserving the directory structure.
@@ -126,6 +139,11 @@ This will recursively find all FLAC files in the `./music` directory and convert
 
 ```bash
 flac-to-alac -d ./music -o ./converted
+```
+
+With AAC format:
+```bash
+flac-to-alac -d ./music -o ./converted --format aac
 ```
 
 This will convert all FLAC files from `./music` and save the M4A files to `./converted`, maintaining the original directory structure.
@@ -144,7 +162,8 @@ flac-to-alac -h
 
 ## Notes
 
-- The tool uses ffmpeg's ALAC encoder for lossless conversion
+- ALAC (default): Lossless compression, larger files, perfect quality
+- AAC: Lossy compression at 256kbps, smaller files, very good quality
 - Album artwork and metadata are preserved during conversion
 - The `-o` option only works with the `-d` (directory) option
 

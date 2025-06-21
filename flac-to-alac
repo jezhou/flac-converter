@@ -10,7 +10,7 @@ import urllib.request
 import tempfile
 
 
-VERSION = "0.1.0"
+VERSION = "0.2.0"
 REPO_URL = "https://raw.githubusercontent.com/jezhou/flac-to-alac/main"
 
 
@@ -66,18 +66,27 @@ def check_ffmpeg():
         sys.exit(1)
 
 
-def convert_file(input_path, output_path):
-    """Convert a single FLAC file to ALAC/M4A format."""
+def convert_file(input_path, output_path, format='alac'):
+    """Convert a single FLAC file to ALAC/AAC M4A format."""
     try:
         cmd = [
             'ffmpeg',
             '-i', str(input_path),
-            '-c:a', 'alac',
+        ]
+        
+        if format == 'alac':
+            # Lossless ALAC encoding
+            cmd.extend(['-c:a', 'alac'])
+        else:  # format == 'aac'
+            # Lossy AAC encoding with high quality
+            cmd.extend(['-c:a', 'aac', '-b:a', '256k'])
+        
+        cmd.extend([
             '-c:v', 'copy',
             '-loglevel', 'error',
             '-y',  # Overwrite output files
             str(output_path)
-        ]
+        ])
 
         result = subprocess.run(cmd, capture_output=True, text=True)
 
@@ -91,7 +100,7 @@ def convert_file(input_path, output_path):
         return False
 
 
-def convert_single_file(file_path):
+def convert_single_file(file_path, format='alac'):
     """Convert a single FLAC file, placing output in the same directory."""
     input_path = Path(file_path)
 
@@ -105,15 +114,16 @@ def convert_single_file(file_path):
 
     output_path = input_path.with_suffix('.m4a')
 
-    print(f"Converting: {input_path} -> {output_path}")
+    format_desc = "ALAC (lossless)" if format == 'alac' else "AAC (lossy)"
+    print(f"Converting to {format_desc}: {input_path} -> {output_path}")
 
-    if convert_file(input_path, output_path):
+    if convert_file(input_path, output_path, format):
         print("Conversion completed successfully.")
     else:
         sys.exit(1)
 
 
-def convert_directory(dir_path, output_dir=None):
+def convert_directory(dir_path, output_dir=None, format='alac'):
     """Convert all FLAC files in a directory recursively."""
     input_dir = Path(dir_path)
 
@@ -132,7 +142,8 @@ def convert_directory(dir_path, output_dir=None):
         print(f"No FLAC files found in '{dir_path}'.")
         return
 
-    print(f"Found {len(flac_files)} FLAC file(s) to convert.")
+    format_desc = "ALAC (lossless)" if format == 'alac' else "AAC (lossy)"
+    print(f"Found {len(flac_files)} FLAC file(s) to convert to {format_desc}.")
 
     # Determine output directory
     if output_dir:
@@ -156,7 +167,7 @@ def convert_directory(dir_path, output_dir=None):
 
         print(f"Converting: {flac_file} -> {output_path}")
 
-        if convert_file(flac_file, output_path):
+        if convert_file(flac_file, output_path, format):
             converted += 1
         else:
             failed += 1
@@ -167,11 +178,12 @@ def convert_directory(dir_path, output_dir=None):
 def main():
     parser = argparse.ArgumentParser(
         prog='flac-to-alac',
-        description='Convert FLAC audio files to ALAC/M4A format using ffmpeg.',
+        description='Convert FLAC audio files to ALAC/AAC M4A format using ffmpeg.',
         epilog='Examples:\n'
-               '  flac-to-alac -f song.flac\n'
+               '  flac-to-alac -f song.flac                     # Convert to ALAC (lossless)\n'
+               '  flac-to-alac -f song.flac --format aac       # Convert to AAC (lossy)\n'
                '  flac-to-alac -d ./music\n'
-               '  flac-to-alac -d ./music -o ./converted',
+               '  flac-to-alac -d ./music -o ./converted --format aac',
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
 
@@ -202,6 +214,14 @@ def main():
         help='Output directory (only works with -d option)',
         metavar='DIR'
     )
+    
+    parser.add_argument(
+        '-F', '--format',
+        choices=['alac', 'aac'],
+        default='alac',
+        help='Output format: alac (lossless, default) or aac (lossy)',
+        metavar='FORMAT'
+    )
 
     args = parser.parse_args()
 
@@ -224,9 +244,9 @@ def main():
 
     # Process based on input type
     if args.file:
-        convert_single_file(args.file)
+        convert_single_file(args.file, args.format)
     else:
-        convert_directory(args.directory, args.output)
+        convert_directory(args.directory, args.output, args.format)
 
 
 if __name__ == '__main__':
