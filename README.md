@@ -1,4 +1,4 @@
-# flac-to-alac
+# flac-converter
 
 A command-line tool to convert FLAC audio files to ALAC (Apple Lossless) or AAC (lossy) in M4A container format.
 
@@ -88,7 +88,7 @@ PREFIX=$HOME/.local ./install.sh
 To update to the latest version:
 
 ```bash
-flac-to-alac --update
+flac-converter --update
 ```
 
 Or reinstall using the install script:
@@ -99,10 +99,10 @@ curl -fsSL https://raw.githubusercontent.com/jezhou/flac-to-alac/main/install.sh
 
 ### Uninstall
 
-To remove flac-to-alac:
+To remove flac-converter:
 
 ```bash
-sudo rm /usr/local/bin/flac-to-alac
+sudo rm /usr/local/bin/flac-converter
 ```
 
 ## Usage
@@ -111,12 +111,12 @@ sudo rm /usr/local/bin/flac-to-alac
 
 Convert to ALAC (lossless, default):
 ```bash
-flac-to-alac -f song.flac
+flac-converter -f song.flac
 ```
 
 Convert to AAC (lossy, smaller file size):
 ```bash
-flac-to-alac -f song.flac --format aac
+flac-converter -f song.flac --format aac
 ```
 
 This will create `song.m4a` in the same directory as the input file.
@@ -125,12 +125,12 @@ This will create `song.m4a` in the same directory as the input file.
 
 Convert to ALAC (default):
 ```bash
-flac-to-alac -d ./music
+flac-converter -d ./music
 ```
 
 Convert to AAC:
 ```bash
-flac-to-alac -d ./music --format aac
+flac-converter -d ./music --format aac
 ```
 
 This will recursively find all FLAC files in the `./music` directory and convert them to M4A, preserving the directory structure.
@@ -138,12 +138,12 @@ This will recursively find all FLAC files in the `./music` directory and convert
 ### Convert with custom output directory
 
 ```bash
-flac-to-alac -d ./music -o ./converted
+flac-converter -d ./music -o ./converted
 ```
 
 With AAC format:
 ```bash
-flac-to-alac -d ./music -o ./converted --format aac
+flac-converter -d ./music -o ./converted --format aac
 ```
 
 This will convert all FLAC files from `./music` and save the M4A files to `./converted`, maintaining the original directory structure.
@@ -151,13 +151,13 @@ This will convert all FLAC files from `./music` and save the M4A files to `./con
 ### Check version
 
 ```bash
-flac-to-alac --version
+flac-converter --version
 ```
 
 ### Help
 
 ```bash
-flac-to-alac -h
+flac-converter -h
 ```
 
 ## Notes

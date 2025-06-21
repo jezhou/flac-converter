@@ -10,13 +10,13 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 import multiprocessing
 
 
-VERSION = "0.3.0"
+VERSION = "1.0.0"
 REPO_URL = "https://raw.githubusercontent.com/jezhou/flac-to-alac/main"
 
 
 def update_tool():
-    """Show instructions for updating flac-to-alac."""
-    print("To update flac-to-alac to the latest version, run:")
+    """Show instructions for updating flac-converter."""
+    print("To update flac-converter to the latest version, run:")
     print()
     print("curl -fsSL https://raw.githubusercontent.com/jezhou/flac-to-alac/main/install.sh | bash")
     print()
@@ -192,14 +192,14 @@ def convert_directory(dir_path, output_dir=None, format='alac', workers=None):
 
 def main():
     parser = argparse.ArgumentParser(
-        prog='flac-to-alac',
+        prog='flac-converter',
         description='Convert FLAC audio files to ALAC/AAC M4A format using ffmpeg.',
         epilog='Examples:\n'
-               '  flac-to-alac -f song.flac                        # Convert single file to AAC\n'
-               '  flac-to-alac -f song.flac --format alac         # Convert to ALAC (lossless)\n'
-               '  flac-to-alac -d ./music                         # Convert directory (parallel)\n'
-               '  flac-to-alac -d ./music -j 4                   # Use 4 parallel workers\n'
-               '  flac-to-alac -d ./music -o ./converted -j 1    # Sequential conversion',
+               '  flac-converter -f song.flac                        # Convert single file to AAC\n'
+               '  flac-converter -f song.flac --format alac         # Convert to ALAC (lossless)\n'
+               '  flac-converter -d ./music                         # Convert directory (parallel)\n'
+               '  flac-converter -d ./music -j 4                   # Use 4 parallel workers\n'
+               '  flac-converter -d ./music -o ./converted -j 1    # Sequential conversion',
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
 
@@ -217,7 +217,7 @@ def main():
     group.add_argument(
         '--update',
         action='store_true',
-        help='Update flac-to-alac to the latest version'
+        help='Update flac-converter to the latest version'
     )
     group.add_argument(
         '--version',
@@ -251,7 +251,7 @@ def main():
 
     # Handle version flag
     if args.version:
-        print(f"flac-to-alac version {VERSION}")
+        print(f"flac-converter version {VERSION}")
         sys.exit(0)
 
     # Handle update flag
