@@ -34,7 +34,7 @@ def update_tool():
 
         # Check if we need sudo for the installation directory and file
         install_dir = os.path.dirname(script_path)
-        needs_sudo = (not os.access(install_dir, os.W_OK) or 
+        needs_sudo = (not os.access(install_dir, os.W_OK) or
                      not os.access(script_path, os.W_OK))
 
         # Replace the old script with the new one
@@ -81,14 +81,14 @@ def convert_file(input_path, output_path, format='alac'):
             'ffmpeg',
             '-i', str(input_path),
         ]
-        
+
         if format == 'alac':
             # Lossless ALAC encoding
             cmd.extend(['-c:a', 'alac'])
         else:  # format == 'aac'
             # Lossy AAC encoding with high quality
-            cmd.extend(['-c:a', 'aac', '-b:a', '256k'])
-        
+            cmd.extend(['-c:a', 'libfdk_aac', '-b:a', '192k'])
+
         cmd.extend([
             '-c:v', 'copy',
             '-loglevel', 'error',
@@ -222,7 +222,7 @@ def main():
         help='Output directory (only works with -d option)',
         metavar='DIR'
     )
-    
+
     parser.add_argument(
         '-F', '--format',
         choices=['alac', 'aac'],
