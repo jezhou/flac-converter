@@ -59,7 +59,7 @@ def convert_file(input_path, output_path, format='alac'):
             cmd.extend(['-c:a', 'aac', '-q:a', '1', '-movflags', '+faststart'])
         else:  # format == 'mp3'
             # Lossy MP3 encoding with high quality
-            cmd.extend(['-c:a', 'libmp3lame', '-b:a', '192k'])
+            cmd.extend(['-c:a', 'libmp3lame', '-b:a', '192k', '-movflags', '+faststart'])
 
         cmd.extend([
             '-c:v', 'copy',
@@ -213,11 +213,11 @@ def main():
         prog='flac-converter',
         description='Convert FLAC audio files to ALAC/AAC (M4A) or MP3 format using ffmpeg.',
         epilog='Examples:\n'
-               '  flac-converter -f song.flac                        # Convert single file to AAC\n'
+               '  flac-converter -f song.flac                        # Convert single file to MP3\n'
                '  flac-converter -f song.flac --format alac         # Convert to ALAC (lossless)\n'
-               '  flac-converter -f song.flac --format mp3          # Convert to MP3\n'
-               '  flac-converter -d ./music                         # Convert directory (parallel)\n'
-               '  flac-converter -d ./music -j 4 --format mp3      # Use 4 workers, convert to MP3',
+               '  flac-converter -f song.flac --format aac          # Convert to AAC\n'
+               '  flac-converter -d ./music                         # Convert directory to MP3\n'
+               '  flac-converter -d ./music -j 4 --format alac     # Use 4 workers, convert to ALAC',
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
 
@@ -252,8 +252,8 @@ def main():
     parser.add_argument(
         '-F', '--format',
         choices=['alac', 'aac', 'mp3'],
-        default='aac',
-        help='Output format: aac (lossy, default), alac (lossless), or mp3 (lossy)',
+        default='mp3',
+        help='Output format: mp3 (lossy, default), alac (lossless), or aac (lossy)',
         metavar='FORMAT'
     )
 
@@ -265,6 +265,11 @@ def main():
         metavar='N'
     )
 
+    # Show full help when no arguments provided
+    if len(sys.argv) == 1:
+        parser.print_help()
+        sys.exit(1)
+    
     args = parser.parse_args()
 
     # Handle version flag
