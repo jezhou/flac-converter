@@ -5,7 +5,7 @@ A command-line tool to convert FLAC audio files to ALAC (Apple Lossless Audio Co
 ## Why
 
 I have a very specific use case where I have a bunch of nested flac files I wanted to convert so I could play them in Apple Music / my iPod, and I couldn't find an out-of-the-box online utility to this for me
-(the closest I could find was [this link](https://unix.stackexchange.com/questions/415477/lossless-audio-conversion-from-flac-to-alac-using-ffmpeg)). So it made sense to just quickly this quickly for me.
+(the closest I could find was [this link](https://unix.stackexchange.com/questions/415477/lossless-audio-conversion-from-flac-to-alac-using-ffmpeg)). It seemed worth it to make this utility for myself.
 
 For transparency, most of the legwork was done by Claude Code and audited / tweaked by me. Feel free to audit the code before using it yourself.
 
