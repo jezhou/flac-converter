@@ -87,7 +87,7 @@ def convert_file(input_path, output_path, format='alac'):
             cmd.extend(['-c:a', 'alac'])
         else:  # format == 'aac'
             # Lossy AAC encoding with high quality
-            cmd.extend(['-c:a', 'libfdk_aac', '-b:a', '192k'])
+            cmd.extend(['-c:a', 'aac', '-b:a', '256k', '-movflags', '+faststart'])
 
         cmd.extend([
             '-c:v', 'copy',
