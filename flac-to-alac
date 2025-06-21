@@ -87,7 +87,7 @@ def convert_file(input_path, output_path, format='alac'):
             cmd.extend(['-c:a', 'alac'])
         else:  # format == 'aac'
             # Lossy AAC encoding with high quality
-            cmd.extend(['-c:a', 'aac', '-b:a', '256k', '-movflags', '+faststart'])
+            cmd.extend(['-c:a', 'aac', '-q:a', '1', '-movflags', '+faststart'])
 
         cmd.extend([
             '-c:v', 'copy',
@@ -226,8 +226,8 @@ def main():
     parser.add_argument(
         '-F', '--format',
         choices=['alac', 'aac'],
-        default='alac',
-        help='Output format: alac (lossless, default) or aac (lossy)',
+        default='aac',
+        help='Output format: aac (lossy, default) or alac (lossless)',
         metavar='FORMAT'
     )
 
