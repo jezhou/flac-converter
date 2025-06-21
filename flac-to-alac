@@ -32,18 +32,26 @@ def update_tool():
             tmp_file.write(content)
             tmp_path = tmp_file.name
 
-        # Check if we need sudo for the installation directory
+        # Check if we need sudo for the installation directory and file
         install_dir = os.path.dirname(script_path)
-        needs_sudo = not os.access(install_dir, os.W_OK)
+        needs_sudo = (not os.access(install_dir, os.W_OK) or 
+                     not os.access(script_path, os.W_OK))
 
         # Replace the old script with the new one
-        if needs_sudo:
-            print(f"Installing update to {script_path} (requires sudo)...")
-            subprocess.run(['sudo', 'cp', tmp_path, script_path], check=True)
-            subprocess.run(['sudo', 'chmod', '+x', script_path], check=True)
-        else:
-            shutil.copy2(tmp_path, script_path)
-            os.chmod(script_path, 0o755)
+        try:
+            if needs_sudo:
+                print(f"Installing update to {script_path} (requires sudo)...")
+                subprocess.run(['sudo', 'cp', tmp_path, script_path], check=True)
+                subprocess.run(['sudo', 'chmod', '755', script_path], check=True)
+            else:
+                shutil.copy2(tmp_path, script_path)
+                os.chmod(script_path, 0o755)
+        except PermissionError:
+            print(f"Permission denied: Cannot write to {script_path}")
+            print("Please run the update with sudo:")
+            print(f"  sudo {script_path} --update")
+            os.unlink(tmp_path)
+            sys.exit(1)
 
         # Clean up
         os.unlink(tmp_path)
