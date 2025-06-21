@@ -29,13 +29,13 @@ For transparency, most of the legwork was done by Claude Code and audited / twea
 Install with a single command:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/yourusername/flac-to-alac/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/jezhou/flac-to-alac/main/install.sh | bash
 ```
 
 Or download and review the install script first:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/yourusername/flac-to-alac/main/install.sh -o install.sh
+curl -fsSL https://raw.githubusercontent.com/jezhou/flac-to-alac/main/install.sh -o install.sh
 chmod +x install.sh
 ./install.sh
 ```
@@ -67,7 +67,7 @@ PREFIX=$HOME/.local ./install.sh
 2. Clone this repository:
 
    ```bash
-   git clone https://github.com/yourusername/flac-to-alac.git
+   git clone https://github.com/jezhou/flac-to-alac.git
    cd flac-to-alac
    ```
 
@@ -93,7 +93,7 @@ flac-to-alac --update
 Or reinstall using the install script:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/yourusername/flac-to-alac/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/jezhou/flac-to-alac/main/install.sh | bash
 ```
 
 ### Uninstall

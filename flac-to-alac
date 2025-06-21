@@ -11,7 +11,7 @@ import tempfile
 
 
 VERSION = "0.1.0"
-REPO_URL = "https://raw.githubusercontent.com/yourusername/flac-to-alac/main"
+REPO_URL = "https://raw.githubusercontent.com/jezhou/flac-to-alac/main"
 
 
 def update_tool():

@@ -13,8 +13,8 @@ DEFAULT_PREFIX="/usr/local"
 PREFIX="${PREFIX:-$DEFAULT_PREFIX}"
 INSTALL_DIR="$PREFIX/bin"
 
-# GitHub repository (update this to your actual repository)
-REPO_URL="https://raw.githubusercontent.com/yourusername/flac-to-alac/main"
+# GitHub repository
+REPO_URL="https://raw.githubusercontent.com/jezhou/flac-to-alac/main"
 
 echo "Installing flac-to-alac..."
 echo ""
