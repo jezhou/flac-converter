@@ -14,7 +14,7 @@ PREFIX="${PREFIX:-$DEFAULT_PREFIX}"
 INSTALL_DIR="$PREFIX/bin"
 
 # GitHub repository
-REPO_URL="https://raw.githubusercontent.com/jezhou/flac-to-alac/main"
+REPO_URL="https://raw.githubusercontent.com/jezhou/flac-converter/main"
 
 echo "Installing flac-converter..."
 echo ""
@@ -22,7 +22,7 @@ echo ""
 # Check for Python 3.6+
 if ! command -v python3 &> /dev/null; then
     echo -e "${RED}Error: Python 3 is not installed.${NC}"
-    echo "Please install Python 3.6 or later to use flac-to-alac."
+    echo "Please install Python 3.6 or later to use flac-converter."
     exit 1
 fi
 

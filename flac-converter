@@ -11,18 +11,18 @@ import multiprocessing
 
 
 VERSION = "1.1.0"
-REPO_URL = "https://raw.githubusercontent.com/jezhou/flac-to-alac/main"
+REPO_URL = "https://raw.githubusercontent.com/jezhou/flac-converter/main"
 
 
 def update_tool():
     """Show instructions for updating flac-converter."""
     print("To update flac-converter to the latest version, run:")
     print()
-    print("curl -fsSL https://raw.githubusercontent.com/jezhou/flac-to-alac/main/install.sh | bash")
+    print("curl -fsSL https://raw.githubusercontent.com/jezhou/flac-converter/main/install.sh | bash")
     print()
     print("This will safely replace your current installation with the latest version.")
     print("You can also download and review the install script first:")
-    print("curl -fsSL https://raw.githubusercontent.com/jezhou/flac-to-alac/main/install.sh -o install.sh")
+    print("curl -fsSL https://raw.githubusercontent.com/jezhou/flac-converter/main/install.sh -o install.sh")
     print("chmod +x install.sh")
     print("./install.sh")
 
@@ -269,7 +269,7 @@ def main():
     if len(sys.argv) == 1:
         parser.print_help()
         sys.exit(1)
-    
+
     args = parser.parse_args()
 
     # Handle version flag
