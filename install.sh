@@ -84,10 +84,10 @@ fi
 echo "Installing to $INSTALL_DIR/flac-to-alac..."
 if [ "$PREFIX" = "/usr/local" ]; then
     sudo cp "$TMP_FILE" "$INSTALL_DIR/flac-to-alac"
-    sudo chmod +x "$INSTALL_DIR/flac-to-alac"
+    sudo chmod 755 "$INSTALL_DIR/flac-to-alac"
 else
     cp "$TMP_FILE" "$INSTALL_DIR/flac-to-alac"
-    chmod +x "$INSTALL_DIR/flac-to-alac"
+    chmod 755 "$INSTALL_DIR/flac-to-alac"
 fi
 
 # Clean up
