@@ -6,6 +6,54 @@ import sys
 import subprocess
 import shutil
 from pathlib import Path
+import urllib.request
+import tempfile
+
+
+VERSION = "1.0.0"
+REPO_URL = "https://raw.githubusercontent.com/yourusername/flac-to-alac/main"
+
+
+def update_tool():
+    """Update flac-to-alac to the latest version."""
+    print("Checking for updates...")
+    
+    try:
+        # Find where the script is installed
+        script_path = shutil.which('flac-to-alac')
+        if not script_path:
+            # If not in PATH, use the current file
+            script_path = os.path.abspath(__file__)
+        
+        # Download the latest version
+        with tempfile.NamedTemporaryFile(mode='w', delete=False) as tmp_file:
+            response = urllib.request.urlopen(f"{REPO_URL}/flac-to-alac")
+            content = response.read().decode('utf-8')
+            tmp_file.write(content)
+            tmp_path = tmp_file.name
+        
+        # Check if we need sudo for the installation directory
+        install_dir = os.path.dirname(script_path)
+        needs_sudo = not os.access(install_dir, os.W_OK)
+        
+        # Replace the old script with the new one
+        if needs_sudo:
+            print(f"Installing update to {script_path} (requires sudo)...")
+            subprocess.run(['sudo', 'cp', tmp_path, script_path], check=True)
+            subprocess.run(['sudo', 'chmod', '+x', script_path], check=True)
+        else:
+            shutil.copy2(tmp_path, script_path)
+            os.chmod(script_path, 0o755)
+        
+        # Clean up
+        os.unlink(tmp_path)
+        
+        print("Successfully updated flac-to-alac!")
+        print("Run 'flac-to-alac --version' to see the new version.")
+        
+    except Exception as e:
+        print(f"Error updating: {str(e)}")
+        sys.exit(1)
 
 
 def check_ffmpeg():
@@ -138,6 +186,16 @@ def main():
         help='Convert all FLAC files in a directory recursively',
         metavar='DIR'
     )
+    group.add_argument(
+        '--update',
+        action='store_true',
+        help='Update flac-to-alac to the latest version'
+    )
+    group.add_argument(
+        '--version',
+        action='store_true',
+        help='Show version information'
+    )
     
     parser.add_argument(
         '-o', '--output',
@@ -146,6 +204,16 @@ def main():
     )
     
     args = parser.parse_args()
+    
+    # Handle version flag
+    if args.version:
+        print(f"flac-to-alac version {VERSION}")
+        sys.exit(0)
+    
+    # Handle update flag
+    if args.update:
+        update_tool()
+        sys.exit(0)
     
     # Check if ffmpeg is installed
     check_ffmpeg()

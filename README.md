@@ -2,6 +2,13 @@
 
 A command-line tool to convert FLAC audio files to ALAC (Apple Lossless Audio Codec) in M4A container format.
 
+## Why
+
+I have a very specific use case where I have a bunch of nested flac files I wanted to convert so I could play them in Apple Music / my iPod, and I couldn't find an out-of-the-box online utility to this for me
+(the closest I could find was [this link](https://unix.stackexchange.com/questions/415477/lossless-audio-conversion-from-flac-to-alac-using-ffmpeg)). So it made sense to just quickly this quickly for me.
+
+For transparency, most of the legwork was done by Claude Code and audited / tweaked by me. Feel free to audit the code before using it yourself.
+
 ## Features
 
 - Convert single FLAC files to ALAC/M4A
@@ -42,27 +49,30 @@ PREFIX=$HOME/.local ./install.sh
 ### Manual Installation
 
 1. Ensure ffmpeg is installed:
+
    ```bash
    # macOS
    brew install ffmpeg
-   
+
    # Ubuntu/Debian
    sudo apt-get install ffmpeg
-   
+
    # Fedora
    sudo dnf install ffmpeg
-   
+
    # Arch
    sudo pacman -S ffmpeg
    ```
 
 2. Clone this repository:
+
    ```bash
    git clone https://github.com/yourusername/flac-to-alac.git
    cd flac-to-alac
    ```
 
 3. Make the script executable:
+
    ```bash
    chmod +x flac-to-alac
    ```
@@ -71,6 +81,20 @@ PREFIX=$HOME/.local ./install.sh
    ```bash
    sudo cp flac-to-alac /usr/local/bin/
    ```
+
+### Update
+
+To update to the latest version:
+
+```bash
+flac-to-alac --update
+```
+
+Or reinstall using the install script:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/yourusername/flac-to-alac/main/install.sh | bash
+```
 
 ### Uninstall
 
@@ -105,6 +129,12 @@ flac-to-alac -d ./music -o ./converted
 ```
 
 This will convert all FLAC files from `./music` and save the M4A files to `./converted`, maintaining the original directory structure.
+
+### Check version
+
+```bash
+flac-to-alac --version
+```
 
 ### Help
 
